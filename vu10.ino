@@ -29,7 +29,7 @@ void vu10() {
 
 void soundtun() {
 
-  int sampleLeft = abs(analogRead(LEFT_IN_PIN) - 512 - DC_OFFSET);
+  int sampleLeft = abs(readLeft());
   CRGB newcolourLeft = ColorFromPalette(currentPalette, constrain(sampleLeft, 0, 255), constrain(sampleLeft, 0, 255), LINEARBLEND);
   nblend(ledsLeft[0], newcolourLeft, 128);
   for (int i = N_PIXELS - 1; i > 0; i--) {
@@ -37,7 +37,7 @@ void soundtun() {
   }
 
   if (STEREO) {
-    int sampleRight = abs(analogRead(RIGHT_IN_PIN) - 512 - DC_OFFSET);
+    int sampleRight = abs(readRight());
     CRGB newcolourRight = ColorFromPalette(currentPalette, constrain(sampleRight, 0, 255), constrain(sampleRight, 0, 255), LINEARBLEND);
     nblend(ledsRight[0], newcolourRight, 128);
     for (int i = N_PIXELS - 1; i > 0; i--) {

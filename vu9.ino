@@ -30,7 +30,7 @@ void vu9() {
 
 void sndwave() {
 
-  int sampleLeft = abs(analogRead(LEFT_IN_PIN) - 512 - DC_OFFSET);
+  int sampleLeft = abs(readLeft());
 
   ledsLeft[N_PIXELS / 2] = ColorFromPalette(currentPalette, sampleLeft, sampleLeft * 2, LINEARBLEND); // Put the sample into the center
   

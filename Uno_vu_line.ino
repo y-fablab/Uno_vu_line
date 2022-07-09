@@ -17,7 +17,6 @@
 # define MAX_MILLIAMPS 500          // Maximum current to draw [500]
 # define COLOR_ORDER GRB            // Colour order of LED strip [GRB]
 # define LED_TYPE WS2812B           // LED string type [WS2812B]
-# define DC_OFFSET 0                // DC offset in aux signal [0]
 # define NOISE 20                   // Noise/hum/interference in aux signal [10]
 # define SAMPLES 60                 // Length of buffer for dynamic level adjustment [60]
 # define TOP (N_PIXELS + 2)         // Allow dot to go slightly off scale [(N_PIXELS + 2)]
@@ -213,14 +212,39 @@ void loop() {
 // -- VU functions --
 // ------------------
 
+int readLeft() {
+    int n = analogRead(LEFT_IN_PIN); // Raw reading from left line in
+
+    // low pass filter to find DC value
+    static int dc_offset = 512;
+    static int acc = 512 * 256;
+    acc = acc - dc_offset + n;
+    dc_offset = acc >> 8;
+
+    return n - dc_offset; // Center on zero  
+}
+
+int readRight() {
+    int n = analogRead(RIGHT_IN_PIN); // Raw reading from mic
+
+    // low pass filter to find DC value
+    static int dc_offset = 512;
+    static int acc = 512 * 256;
+    acc = acc - dc_offset + n;
+    dc_offset = acc >> 8;
+
+    return n - dc_offset; // Center on zero  
+}
+
 uint16_t auxReading(uint8_t channel) {
 
   int n = 0;
   uint16_t height = 0;
 
+  // on ESP8266, called at about 400Hz
+  
   if(channel == 0) {
-    int n = analogRead(LEFT_IN_PIN); // Raw reading from left line in
-    n = abs(n - 512 - DC_OFFSET); // Center on zero
+    n = abs(readLeft()); // Center on zero
     n = (n <= NOISE) ? 0 : (n - NOISE); // Remove noise/hum
     lvlLeft = ((lvlLeft * 7) + n) >> 3; // "Dampened" reading else looks twitchy (>>3 is divide by 8)
     volLeft[volCountLeft] = n; // Save sample for dynamic leveling
@@ -230,8 +254,7 @@ uint16_t auxReading(uint8_t channel) {
   }
   
   else {
-    int n = analogRead(RIGHT_IN_PIN); // Raw reading from mic
-    n = abs(n - 512 - DC_OFFSET); // Center on zero
+    n = abs(readRight()); // Center on zero
     n = (n <= NOISE) ? 0 : (n - NOISE); // Remove noise/hum
     lvlRight = ((lvlRight * 7) + n) >> 3; // "Dampened" reading (else looks twitchy)
     volRight[volCountRight] = n; // Save sample for dynamic leveling
