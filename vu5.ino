@@ -2,7 +2,7 @@
  * VU: Old-skool green and red from bottom or middle
  */
 
-void vu5(bool is_centered, uint8_t channel) {
+void vu5(int center_mode, uint8_t channel) {
 
   CRGB* leds;
   uint8_t i = 0;
@@ -21,7 +21,7 @@ void vu5(bool is_centered, uint8_t channel) {
   if (height > *peak)
     *peak = height; // Keep 'peak' dot at top
 
-  if(is_centered) {
+  if (center_mode == 1) {
     // Color pixels based on old school green / red
     for (uint8_t i = 0; i < N_PIXELS_HALF; i++) {
       if (i >= height) {
@@ -50,7 +50,35 @@ void vu5(bool is_centered, uint8_t channel) {
         leds[N_PIXELS_HALF + *peak] = CRGB::Green;
       }
     }
-    
+  } else if (center_mode == 2) {
+    // Color pixels based on old school green / red
+    for (uint8_t i = 0; i < N_PIXELS_HALF; i++) {
+      if (i >= height) {
+        // Pixels greater than peak, no light
+        leds[i] = CRGB::Black;
+        leds[N_PIXELS - 1 - i] = CRGB::Black;
+      } else {
+        if (i > N_PIXELS_HALF - (N_PIXELS_HALF / 3)){
+          leds[i] = CRGB::Red;
+          leds[N_PIXELS - 1 - i] = CRGB::Red;
+        }
+        else {
+          leds[i] = CRGB::Green;
+          leds[N_PIXELS - 1 - i] = CRGB::Green;
+        }
+      }
+    }
+  
+    // Draw peak dot
+    if (*peak > 0 && *peak <= N_PIXELS_HALF - 1) {
+      if (*peak > N_PIXELS_HALF - (N_PIXELS_HALF / 3)){
+        leds[N_PIXELS - *peak - 1] = CRGB::Red;
+        leds[*peak] = CRGB::Red;
+      } else {
+        leds[N_PIXELS - *peak - 1] = CRGB::Green;
+        leds[*peak] = CRGB::Green;
+      }
+    }
   } else {
     // Color pixels based on old school green/red vu
     for (uint8_t i = 0; i < N_PIXELS; i++) {

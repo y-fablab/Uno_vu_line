@@ -2,7 +2,7 @@
  * VU: Rainbow from bottom or middle, green through purple
  */
 
-void vu4(bool is_centered, uint8_t channel) {
+void vu4(int center_mode, uint8_t channel) {
   
   CRGB* leds;
   uint8_t i = 0;
@@ -20,7 +20,7 @@ void vu4(bool is_centered, uint8_t channel) {
   
   // Draw vu meter part
   fill_solid(leds, N_PIXELS, CRGB::Black);
-  if(is_centered) {
+  if (center_mode == 1) {
     
     // Fill with colour gradient
     fill_gradient(leds, N_PIXELS_HALF  , CHSV(96, 255, 255), N_PIXELS - 1, CHSV(224, 255, 255),SHORTEST_HUES);
@@ -40,9 +40,26 @@ void vu4(bool is_centered, uint8_t channel) {
       leds[N_PIXELS_HALF + *peak]   = CHSV(rainbowHue2(*peak, N_PIXELS_HALF),255,255);
       leds[N_PIXELS_HALF - 1 - *peak] = CHSV(rainbowHue2(*peak, N_PIXELS_HALF),255,255);
     }
-  } 
-  
-  else {
+  } else if(center_mode == 2) {
+    // Fill with colour gradient
+    fill_gradient(leds, N_PIXELS_HALF  , CHSV(224, 255, 255), N_PIXELS - 1, CHSV(96, 255, 255), SHORTEST_HUES);
+    fill_gradient(leds, N_PIXELS_HALF-1, CHSV(224, 255, 255), 0, CHSV(96, 255, 255), LONGEST_HUES);
+    
+    // Black out ends
+    for (i = 0; i < N_PIXELS; i++) {
+      uint8_t numBlack = constrain(height, 0, N_PIXELS-1) / 2;
+      if(i >= numBlack -1 && i <= N_PIXELS - numBlack) leds[i] = CRGB::Black;
+    }
+    
+    // Draw peak dot  
+    if(height/2 > *peak)
+      *peak = height/2; // Keep 'peak' dot at top
+
+    if(*peak > 0 && *peak <= N_PIXELS_HALF-1) {
+      leds[N_PIXELS - 1 - *peak]   = CHSV(rainbowHue2(*peak, N_PIXELS_HALF),255,255);
+      leds[*peak] = CHSV(rainbowHue2(*peak, N_PIXELS_HALF),255,255);
+    }  
+  } else {
     // Fill with color gradient
     fill_gradient(leds, 0, CHSV(96, 255, 255), N_PIXELS - 1, CHSV(224, 255, 255),SHORTEST_HUES);
     

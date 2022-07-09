@@ -42,8 +42,8 @@ CRGB ledsRight[N_PIXELS];
 
 uint8_t myhue = 0;
 
-void vu4(bool is_centered, uint8_t channel);
-void vu5(bool is_centered, uint8_t channel);
+void vu4(int center_mode, uint8_t channel);
+void vu5(int center_mode, uint8_t channel);
 void vu6(bool is_centered, uint8_t channel);
 void vu7(bool show_background);
 void vu8();
@@ -126,26 +126,26 @@ void loop() {
   // Run selected pattern
   switch (buttonPushCounter) {
     case 0:
-      vu4(false, 0);
-      if (STEREO) vu4(false, 1);
+      vu4(1, 0);
+      if (STEREO) vu4(1, 1);
       else copyLeftToRight();
       break;
   
     case 1:
-      vu4(true, 0);
-      if (STEREO) vu4(true, 1);
+      vu4(2, 0);
+      if (STEREO) vu4(2, 1);
       else copyLeftToRight();
       break;
   
     case 2:
-      vu5(false, 0);
-      if (STEREO) vu5(false, 1);
+      vu5(1, 0);
+      if (STEREO) vu5(1, 1);
       else copyLeftToRight();
       break;
   
     case 3:
-      vu5(true, 0);
-      if (STEREO) vu5(true, 1);
+      vu5(2, 0);
+      if (STEREO) vu5(2, 1);
       else copyLeftToRight();
       break;
   
