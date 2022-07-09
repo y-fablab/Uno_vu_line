@@ -6,24 +6,24 @@
 #include <EEPROM.h>
 #include <JC_Button.h>
 
-# define LEFT_OUT_PIN 6             // Left channel data out pin to LEDs [6]
-# define RIGHT_OUT_PIN 5            // Right channel data out pin to LEDs [5]
-# define LEFT_IN_PIN A5             // Left aux in signal [A5]
-# define RIGHT_IN_PIN A4            // Right aux in signal [A4]
-# define BTN_PIN 3                  // Push button on this pin [3]
+# define LEFT_OUT_PIN 2             // Left channel data out pin to LEDs [6]
+# define RIGHT_OUT_PIN 4            // Right channel data out pin to LEDs [5]
+# define LEFT_IN_PIN A0             // Left aux in signal [A5]
+# define RIGHT_IN_PIN A0            // Right aux in signal [A4]
+# define BTN_PIN D2                 // Push button on this pin [3]
 # define DEBOUNCE_MS 20             // Number of ms to debounce the button [20]
 # define LONG_PRESS 500             // Number of ms to hold the button to count as long press [500]
-# define N_PIXELS 18                // Number of pixels in each string [24]
+# define N_PIXELS 34                // Number of pixels in each string [24]
 # define MAX_MILLIAMPS 500          // Maximum current to draw [500]
 # define COLOR_ORDER GRB            // Colour order of LED strip [GRB]
 # define LED_TYPE WS2812B           // LED string type [WS2812B]
-# define NOISE 20                   // Noise/hum/interference in aux signal [10]
+# define NOISE 5                    // Noise/hum/interference in aux signal [10]
 # define SAMPLES 60                 // Length of buffer for dynamic level adjustment [60]
 # define TOP (N_PIXELS + 2)         // Allow dot to go slightly off scale [(N_PIXELS + 2)]
 # define PEAK_FALL 20               // Rate of peak falling dot [20]
 # define N_PIXELS_HALF (N_PIXELS / 2)
 # define PATTERN_TIME 10            // Seconds to show eaach pattern on auto [10]
-# define STEREO true                // If true, L&R channels are independent. If false, both L&R outputs display same data from L audio channel [false]
+# define STEREO false               // If true, L&R channels are independent. If false, both L&R outputs display same data from L audio channel [false]
 
 uint8_t volCountLeft = 0;           // Frame counter for storing past volume data
 int volLeft[SAMPLES];               // Collection of prior volume samples
