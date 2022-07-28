@@ -71,9 +71,22 @@ void incrementButtonPushCounter() {
   EEPROM.write(1, buttonPushCounter);
 }
 
+bool genesis_mode;
+
 void setup() {
   delay(1000); // power-up safety delay
 
+  pinMode(D1, OUTPUT);
+  digitalWrite(D1, LOW); 
+
+  pinMode(D3, INPUT);
+  genesis_mode = digitalRead(D3);
+
+  if (genesis_mode) {
+    setup_genesis();
+    return;
+  } 
+  
   FastLED.addLeds < LED_TYPE, LEFT_OUT_PIN, COLOR_ORDER > (ledsLeft, N_PIXELS).setCorrection(TypicalLEDStrip);
   FastLED.addLeds < LED_TYPE, RIGHT_OUT_PIN, COLOR_ORDER > (ledsRight, N_PIXELS).setCorrection(TypicalLEDStrip);
   //FastLED.setBrightness(BRIGHTNESS);
@@ -90,6 +103,11 @@ void setup() {
 
 void loop() {
 
+  if (genesis_mode) {
+     loop_genesis();
+     return; 
+  }
+  
   // Read button
   modeBtn.read(); 
   switch (state) {
