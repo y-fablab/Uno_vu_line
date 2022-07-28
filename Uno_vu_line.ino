@@ -10,7 +10,7 @@
 # define RIGHT_OUT_PIN 4            // Right channel data out pin to LEDs [5]
 # define LEFT_IN_PIN A0             // Left aux in signal [A5]
 # define RIGHT_IN_PIN A0            // Right aux in signal [A4]
-# define BTN_PIN D2                 // Push button on this pin [3]
+# define BTN_PIN D3                 // Push button on this pin [3]
 # define DEBOUNCE_MS 20             // Number of ms to debounce the button [20]
 # define LONG_PRESS 500             // Number of ms to hold the button to count as long press [500]
 # define N_PIXELS 34                // Number of pixels in each string [24]
@@ -62,7 +62,7 @@ void rainbow(uint8_t rate);
 // --------------------
 uint8_t state = 0;
 int buttonPushCounter = 0;
-bool autoChangeVisuals = false;
+bool autoChangeVisuals = true;
 Button modeBtn(BTN_PIN, DEBOUNCE_MS);
 
 
