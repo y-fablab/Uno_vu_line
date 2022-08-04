@@ -11,6 +11,7 @@
 
 #define NUM_LEDS        35
 #define LED_PIN         2  // D4
+#define BTN_PIN         D3
 
 
 /*** types ***/
@@ -41,6 +42,8 @@ uint32_t seqDuration;  // in us
 uint32_t seqWaitTime;  // time from seqStart, in us
 uint32_t prgDuration;  // duration of all sequneces, in us
 
+int forceSeq = -1;
+
 
 /*** functions ***/
 
@@ -60,6 +63,14 @@ void nodeTimeAdjustedCallback(int32_t offset) {
   Serial.printf("Adjusted time: t=%u offset=%d\n", mesh.getNodeTime(), offset);
 }
 
+bool buttonState() {
+  return !digitalRead(BTN_PIN);  
+}
+
+bool testCancelCondition() {
+  return buttonState();
+}
+
 /*
  * Wait some time by staying perfectly locked to the mesh network time.
  * If we cannot stay locked to the mesh network time, this funciton
@@ -68,6 +79,9 @@ void nodeTimeAdjustedCallback(int32_t offset) {
  * the sequence.
  */
 bool lockedDelay(uint32_t ms) {
+  if (testCancelCondition())
+    return true;
+
   uint32_t waitTime = ms * 1000;
   seqWaitTime += waitTime;
   for (;;) {
@@ -100,6 +114,9 @@ bool lockedDelay(uint32_t ms) {
  * the sequence. 
  */
 bool unlockedDelay(uint32_t ms) {
+  if (testCancelCondition())
+    return true;
+
   uint32_t waitTime = ms * 1000;
   uint32_t t1 = mesh.getNodeTime();
   for (;;) {
@@ -167,15 +184,21 @@ void checkIntensity() {
 
 void startSeq() {
   uint32_t t = mesh.getNodeTime();
-  uint32_t timeInPrg = t % prgDuration;
   int seq = 0;
-  uint32_t timeInSeq = timeInPrg;
-  for (int i=0; i<seqCount; i++) {
-    if (timeInSeq < sequences[i].duration * 1000) {
-      seq = i;
-      break;  
+  uint32_t timeInSeq = 0;
+
+  if (forceSeq == -1) {
+    uint32_t timeInPrg = t % prgDuration;
+    timeInSeq = timeInPrg;
+    for (int i=0; i<seqCount; i++) {
+      if (timeInSeq < sequences[i].duration * 1000) {
+        seq = i;
+        break;  
+      }
+      timeInSeq -= sequences[i].duration * 1000;
     }
-    timeInSeq -= sequences[i].duration * 1000;
+  } else {
+    seq = forceSeq;
   }
 
   Serial.printf("start seq=%d timeInSeq=%dus\n", seq, timeInSeq);
@@ -203,6 +226,8 @@ void startSeq() {
 }
 
 void setup_genesis() {
+  pinMode(BTN_PIN, INPUT);
+
   Serial.begin(115200);
 
   FastLED.addLeds<WS2811, LED_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -225,6 +250,13 @@ void setup_genesis() {
 }
 
 void loop_genesis() {
+  if (buttonState()) {
+    delay(50);
+    while (buttonState()) {}
+    forceSeq++;
+    if (forceSeq >= seqCount)
+      forceSeq = 0;
+  }
   startSeq();
 }
 
