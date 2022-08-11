@@ -193,7 +193,7 @@ void startSeq() {
     for (int i=0; i<seqCount; i++) {
       if (timeInSeq < sequences[i].duration * 1000) {
         seq = i;
-        break;  
+        break;
       }
       timeInSeq -= sequences[i].duration * 1000;
     }
@@ -251,11 +251,25 @@ void setup_genesis() {
 
 void loop_genesis() {
   if (buttonState()) {
+    uint32_t t1 = millis();
+    bool longPress = false;
     delay(50);
-    while (buttonState()) {}
-    forceSeq++;
-    if (forceSeq >= seqCount)
-      forceSeq = 0;
+    while (buttonState()) {
+      uint32_t t2 = millis() - t1;
+      delay(1);
+      if (t2 > 1000) {
+        setAll(0, 0, 0);
+        showStrip();
+        longPress = true;
+      }
+    }
+    if (longPress) {
+      forceSeq = -1;
+    } else {
+      forceSeq++;
+      if (forceSeq >= seqCount)
+        forceSeq = 0;
+    }
   }
   startSeq();
 }
